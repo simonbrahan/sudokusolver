@@ -16,14 +16,24 @@ pub fn parse(input: &str) -> Result<(Vec<Option<usize>>, usize), &str> {
     .cloned()
     .collect();
 
-    let game_board: Vec<Option<usize>> = input.split(",").map(|num| num.parse().ok()).collect();
+    let game_board: Vec<Option<usize>> = input.split(',').map(|num| num.parse().ok()).collect();
 
     let maybe_max_symbol = valid_board_lengths.get(&game_board.len());
 
-    match maybe_max_symbol {
-        None => Err("Game board must be a square of max size 9"),
-        Some(max_symbol) => Ok((game_board, *max_symbol)),
+    if maybe_max_symbol.is_none() {
+        return Err("Game board must be a square of max size 9");
     }
+
+    let max_symbol = *maybe_max_symbol.unwrap();
+
+    if game_board
+        .iter()
+        .any(|maybe_num| maybe_num.unwrap_or(0) > max_symbol)
+    {
+        return Err("Board contains a symbol that is too large");
+    }
+
+    Ok((game_board, max_symbol))
 }
 
 #[cfg(test)]
@@ -86,6 +96,14 @@ mod tests {
             Err("Game board must be a square of max size 9"),
             // Board is square, but is 100 blocks - too large
             parse(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+        );
+    }
+
+    #[test]
+    fn parse_board_symbol_too_large() {
+        assert_eq!(
+            Err("Board contains a symbol that is too large"),
+            parse("1,2,3,4,,,,,")
         );
     }
 }
