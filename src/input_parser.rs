@@ -43,7 +43,10 @@ mod tests {
     #[test]
     fn parse_empty_three_square() {
         assert_eq!(
-            Ok((vec![None, None, None, None, None, None, None, None, None], 3)),
+            Ok((
+                vec![None, None, None, None, None, None, None, None, None],
+                3
+            )),
             parse(",,,,,,,,")
         );
     }
@@ -51,7 +54,20 @@ mod tests {
     #[test]
     fn parse_three_square() {
         assert_eq!(
-            Ok((vec![Some(1), None, Some(2), None, None, None, Some(3), None, None], 3)),
+            Ok((
+                vec![
+                    Some(1),
+                    None,
+                    Some(2),
+                    None,
+                    None,
+                    None,
+                    Some(3),
+                    None,
+                    None
+                ],
+                3
+            )),
             parse("1,,2,,,,3,,")
         );
     }
