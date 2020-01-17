@@ -1,19 +1,19 @@
-pub type Board = [Option<usize>];
+pub type Board = Vec<Option<usize>>;
 
 use std::collections::HashSet;
 use std::collections::VecDeque;
 
-pub fn solve(board: &Board) { //}-> Option<Board> {
-    let mut candidate_boards: VecDeque<&Board> = VecDeque::new();
-    candidate_boards.push_back(&board);
+pub fn solve(board: &Board) {
+    let mut candidate_boards: VecDeque<Board> = VecDeque::new();
+    candidate_boards.push_back(board.to_owned());
 
     'boards: while !candidate_boards.is_empty() {
         let candidate_board = candidate_boards.pop_front().unwrap();
-        let empty_cells = get_empty_cells(&board);
+        let empty_cells = get_empty_cells(&candidate_board);
 
         if empty_cells.is_empty() {
-            print_board(candidate_board);
-            //return Some(candidate_board);
+            print_board(&candidate_board);
+            return;
         }
 
         for empty_cell_idx in empty_cells {
@@ -24,14 +24,14 @@ pub fn solve(board: &Board) { //}-> Option<Board> {
             }
 
             for cell_option in cell_options {
-                let mut new_candidate_board = candidate_board.to_vec();
+                let mut new_candidate_board = candidate_board.to_owned();
                 new_candidate_board[empty_cell_idx] = Some(cell_option);
-                candidate_boards.push_back(&new_candidate_board);
+                candidate_boards.push_back(new_candidate_board);
             }
         }
     }
 
-    print_board(board);
+    println!("Could not solve");
 }
 
 pub fn print_board(board: &Board) {
@@ -43,7 +43,13 @@ pub fn print_board(board: &Board) {
     let board_lines = board_symbols.chunks(9);
 
     for line in board_lines {
-        println!("{:?}", line);
+        println!(
+            "{}",
+            line.iter()
+                .map(|num| num.to_string())
+                .collect::<Vec<String>>()
+                .join(",")
+        );
     }
 }
 

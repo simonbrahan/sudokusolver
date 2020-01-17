@@ -7,12 +7,5 @@ fn main() {
     let input = env::args().nth(1).expect("Script accepts one argument");
     let game_board = input_parser::parse(&input).unwrap();
 
-    game::print_board(&game_board);
-
-    //match game::solve(&game_board) {
-//        Some(solved_board) => game::print_board(&solved_board),
-//        None => println!("Unsolvable"),
-    //}
-
     game::solve(&game_board);
 }
