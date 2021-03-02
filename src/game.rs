@@ -1,7 +1,8 @@
-pub type Board = Vec<Option<usize>>;
+pub type Board = [Option<usize>; 81];
 
 use std::collections::HashSet;
 use std::collections::VecDeque;
+use std::convert::TryFrom;
 
 pub fn solve(board: &Board) {
     let mut candidate_boards: VecDeque<Board> = VecDeque::new();
@@ -32,6 +33,29 @@ pub fn solve(board: &Board) {
     }
 
     println!("Could not solve");
+}
+
+pub fn parse(input: &str) -> Result<Board, &str> {
+    let game_board: Vec<Option<usize>> = input
+        .chars()
+        .filter(|char| !char.is_whitespace())
+        .collect::<String>()
+        .split(',')
+        .map(|num| num.parse().ok())
+        .collect();
+
+    if game_board.len() != 81 {
+        return Err("Board must be 81 symbols in length");
+    }
+
+    if game_board
+        .iter()
+        .any(|maybe_num| maybe_num.unwrap_or(0) > 9)
+    {
+        return Err("Board may only contain symbols 1 to 9 or blank squares");
+    }
+
+    Ok(Board::try_from(game_board).unwrap())
 }
 
 pub fn print_board(board: &Board) {
@@ -111,15 +135,6 @@ fn get_cell_options(board: &Board, cell_idx: usize) -> Vec<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::input_parser::parse;
-
-    #[test]
-    fn empty_spaces_from_partial_board() {
-        assert_eq!(
-            vec![0, 2],
-            get_empty_cells(&vec![None, Some(1), None, Some(2)])
-        );
-    }
 
     #[test]
     fn cell_options_from_full_board() {
@@ -199,5 +214,29 @@ mod tests {
         .unwrap();
 
         assert_eq!(vec![6], get_cell_options(&board_with_partial_row, 10))
+    }
+
+    #[test]
+    fn parse_board_too_small() {
+        assert_eq!(
+            Err("Board must be 81 symbols in length"),
+            parse(&",".repeat(79))
+        );
+    }
+
+    #[test]
+    fn parse_board_too_large() {
+        assert_eq!(
+            Err("Board must be 81 symbols in length"),
+            parse(&",".repeat(81))
+        );
+    }
+
+    #[test]
+    fn parse_board_invalid_symbol() {
+        assert_eq!(
+            Err("Board may only contain symbols 1 to 9 or blank squares"),
+            parse(&(",".repeat(80) + "10"))
+        );
     }
 }

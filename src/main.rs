@@ -1,11 +1,10 @@
 use std::env;
 
 mod game;
-mod input_parser;
 
 fn main() {
     let input = env::args().nth(1).expect("Script accepts one argument");
-    let game_board = input_parser::parse(&input).unwrap();
+    let game_board = game::parse(&input).unwrap();
 
     game::solve(&game_board);
 }
